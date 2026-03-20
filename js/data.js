@@ -149,19 +149,14 @@ const Data = (() => {
 
           if (result === 'CORRECT') {
             status = 'correct';
-          } else if (result === 'INCORRECT') {
-            // Check if the team was eliminated in a PRIOR round (never made it here)
-            // vs lost IN this round's actual game
-            if (elimRound !== undefined && elimRound < roundIndex) {
-              status = 'eliminated'; // team was knocked out before this round
-            } else {
-              status = 'incorrect'; // team played in this round and lost
-            }
           } else if (elimRound !== undefined && elimRound < roundIndex) {
-            // Team was knocked out in an earlier round, game hasn't been scored yet
+            // Team was knocked out in an earlier round — only count as a
+            // loss once the game they would have played in has been decided.
             const prop = propositionMap[pick.propositionId];
             const gameDecided = prop?.correctOutcomes?.length > 0;
             status = gameDecided ? 'eliminated' : 'eliminated-pending';
+          } else if (result === 'INCORRECT') {
+            status = 'incorrect'; // team played in this round and lost
           } else if (elimRound !== undefined && elimRound === roundIndex) {
             // Team lost in this round — but ESPN hasn't marked the pick yet
             status = 'incorrect';
